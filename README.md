@@ -1,7 +1,9 @@
-docker-confluent
+docker-confluent 
 ----------------
 
 Docker images for deploying and running Kafka services based on the [Confluent Platform](https://www.confluent.io/product/confluent-platform/).
+
+[![Docker Repository on Quay](https://quay.io/repository/nordstrom/confluent-kafka-broker/status "Docker Repository on Quay")](https://quay.io/repository/nordstrom/confluent-kafka-broker)
 
 ## about
 
