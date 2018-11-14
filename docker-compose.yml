@@ -1,0 +1,66 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.0.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+    - 2181:2181
+    logging: { driver: none }
+
+  broker:
+    build: ./broker/
+    #image: confluentinc/cp-kafka:5.0.0
+    ports:
+    - 9092:9092
+    - 9011:9011
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:9092"
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: 10
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+    depends_on: [zookeeper]
+
+  schema-registry:
+    build: ./schema-registry/
+    #image: confluentinc/cp-schema-registry:5.0.0
+    hostname: schema-registry
+    ports:
+    - 8080:8080
+    - 9012:9011
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8080"
+
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://broker:9092"
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: __schemas
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_KAFKASTORE_TIMEOUT_MS: 15000
+    depends_on: [broker]
+
+  connect:
+    build: ./connect/
+    #image: confluentinc/cp-kafka-connect:5.0.0
+    ports:
+    - 8083:8083
+    - 9013:9011
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: broker:9092
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: connect
+      CONNECT_CONFIG_STORAGE_TOPIC: __connect_configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_TOPIC: __connect_offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: __connect_status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    depends_on: [broker]
