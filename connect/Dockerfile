@@ -14,7 +14,4 @@ RUN mkdir -p /etc/jmx_exporter /opt/lib \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectStandalone -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-standalone \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectDistributed -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-distributed
 
-#ADD connector jar files on CLASSPATH; /usr/share/java/kafka-connect-NNN is recommended loc.
-#RUN chmod 644 /usr/share/java/kafka-connect-NNN/*
-
 USER connect

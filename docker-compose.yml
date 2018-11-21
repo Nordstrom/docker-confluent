@@ -27,8 +27,8 @@ services:
 
       # KAFKA_LOG4J_ROOT_LOGLEVEL: DEBUG
       KAFKA_PRINCIPAL_BUILDER_CLASS: "com.nordstrom.kafka.security.auth.RegexPrincipalBuilder"
-      # Regex to derive principal following 'slash-path' naming convention of <principal>/<user>
-      KAFKA_PRINCIPAL_BUILDER_REGEX: "(.+)/(.+)"
+      # Regex to derive principal following 'slash-path' naming convention of <principal>/<uid>
+      KAFKA_PRINCIPAL_BUILDER_REGEX: "(.+)/.+"
       # Uncomment to debug authorization.
       # KAFKA_LOG4J_LOGGERS: "kafka.authorizer.logger=DEBUG,com.nordstrom.kafka.security.auth=DEBUG"
     depends_on: [zookeeper]

@@ -15,8 +15,8 @@ RUN mkdir -p /etc/jmx_exporter /opt/lib \
  && echo "---" > $PROMETHEUS_JMX_EXPORTER_CONF \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name kafkaServer -loggc -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/kafka-server-start
 
-# Add customer principal builder and set permissions on jar file for read by group/others.
-ADD https://github.com/Nordstrom/kafka-regex-principal-builder/releases/download/v0.0.3/kafka-regex-principal-builder-0.0.3.jar /usr/share/java/kafka/
-RUN chmod 644 /usr/share/java/kafka/kafka-regex-principal-builder-0.0.3.jar
+# Add customized PrincipalBuilder and set permissions on jar file for read by group/others.
+RUN curl -L https://github.com/Nordstrom/kafka-regex-principal-builder/releases/download/v0.0.3/kafka-regex-principal-builder-0.0.3.jar -o /usr/share/java/kafka/kafka-regex-principal-builder-0.0.3.jar \
+ && chmod 644 /usr/share/java/kafka/kafka-regex-principal-builder-0.0.3.jar
 
 USER broker
