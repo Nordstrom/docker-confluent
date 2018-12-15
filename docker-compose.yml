@@ -11,14 +11,16 @@ services:
 
   broker:
     build: ./broker/
-    #image: quay.io/nordstrom/confluent-kafka-broker:5.0.1-3
-    #image: confluentinc/cp-kafka:5.0.0
+    #image: confluentinc/cp-kafka:5.0.1
     ports:
     - 9092:9092
     - 9011:9011
     environment:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker:9092"
+      KAFKA_LISTENERS: "PUBLIC://0.0.0.0:9092,INTERNAL://0.0.0.0:19092"
+      KAFKA_ADVERTISED_LISTENERS: "PUBLIC://localhost:9092,INTERNAL://broker:19092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PUBLIC:PLAINTEXT,INTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_NUM_PARTITIONS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 1
       KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS: 10
@@ -36,7 +38,7 @@ services:
 
   schema-registry:
     build: ./schema-registry/
-    #image: confluentinc/cp-schema-registry:5.0.0
+    #image: confluentinc/cp-schema-registry:5.0.1
     hostname: schema-registry
     ports:
     - 8080:8080
@@ -45,7 +47,7 @@ services:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8080"
 
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://broker:9092"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://broker:19092"
       SCHEMA_REGISTRY_KAFKASTORE_TOPIC: __schemas
       SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
       SCHEMA_REGISTRY_KAFKASTORE_TIMEOUT_MS: 15000
@@ -53,12 +55,12 @@ services:
 
   connect:
     build: ./connect/
-    #image: confluentinc/cp-kafka-connect:5.0.0
+    #image: confluentinc/cp-kafka-connect:5.0.1
     ports:
     - 8083:8083
     - 9013:9011
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: broker:9092
+      CONNECT_BOOTSTRAP_SERVERS: broker:19092
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
       CONNECT_GROUP_ID: connect
       CONNECT_CONFIG_STORAGE_TOPIC: __connect_configs
