@@ -1,4 +1,4 @@
-FROM confluentinc/cp-kafka-connect:5.0.1
+FROM confluentinc/cp-kafka-connect:5.1.0
 
 RUN groupadd -g 1000 connect \
  && useradd -r -m -u 1000 -g connect connect

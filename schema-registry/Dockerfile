@@ -1,4 +1,4 @@
-FROM confluentinc/cp-schema-registry:5.0.1
+FROM confluentinc/cp-schema-registry:5.1.0
 
 RUN groupadd -g 1000 schema-registry \
  && useradd -r -m -u 1000 -g schema-registry schema-registry
