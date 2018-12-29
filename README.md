@@ -8,9 +8,10 @@ Docker images for deploying and running Kafka services based on the [Confluent P
 ## about
 
 The images are based on [confluentinc/cp-docker-images](https://github.com/confluentinc/cp-docker-images) and have been modified to:
-- [x] Execute as non-privileged users
-- [x] Include a [Prometheus JMX exporter](https://github.com/prometheus/jmx_exporter)
-- [x] Include a [customized PrincipalBuilder](https://github.com/Nordstrom/kafka-regex-principal-builder)
+- Execute as non-privileged users
+- Include a [Prometheus JMX exporter](https://github.com/prometheus/jmx_exporter)
+- Include a [customized PrincipalBuilder](https://github.com/Nordstrom/kafka-regex-principal-builder)
+- Remove behaviors attached to `KAFKA_ADVERTISED_LISTENERS` env variable
 
 ## example
 
