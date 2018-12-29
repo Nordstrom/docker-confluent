@@ -2,8 +2,9 @@ FROM confluentinc/cp-kafka:5.0.1
 
 RUN groupadd -g 1000 broker \
  && useradd -r -m -u 1000 -g broker broker \
- && chown -hR broker:broker /var/lib/kafka \
- && chown -hR broker:broker /var/log/kafka
+ && chown -R broker:broker /var/lib/kafka \
+ && chown -R broker:broker /var/log/kafka \
+ && sed -i 's/if \[\[ \$KAFKA_ADVERTISED_LISTENERS/if \[\[ ""/' /etc/confluent/docker/configure
 
 ENV PROMETHEUS_JMX_EXPORTER_PORT=9011
 ENV PROMETHEUS_JMX_EXPORTER_CONF=/etc/jmx_exporter/kafka_broker.yaml
