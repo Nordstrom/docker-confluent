@@ -11,7 +11,7 @@ services:
 
   broker:
     build: ./broker/
-    #image: confluentinc/cp-kafka:5.0.1
+    #image: confluentinc/cp-kafka:5.1.0
     ports:
     - 9092:9092
     - 9011:9011
@@ -38,7 +38,7 @@ services:
 
   schema-registry:
     build: ./schema-registry/
-    #image: confluentinc/cp-schema-registry:5.0.1
+    #image: confluentinc/cp-schema-registry:5.1.0
     hostname: schema-registry
     ports:
     - 8080:8080
@@ -55,7 +55,7 @@ services:
 
   connect:
     build: ./connect/
-    #image: confluentinc/cp-kafka-connect:5.0.1
+    #image: confluentinc/cp-kafka-connect:5.1.0
     ports:
     - 8083:8083
     - 9013:9011
@@ -73,4 +73,17 @@ services:
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+      # This will include all connector plugins, including Nordstrom kafka-connect-sqs
+      # NB: must include confluent-hub-components, or connect startup will fail :(
+      # CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+      CONNECT_PLUGIN_PATH: /usr/share/java/kafka-connect-sqs
+
+      # Uncomment if you want to run locally and have access to AWS resources
+      # such as SQS queues.
+      AWS_PROFILE: ${AWS_PROFILE}
+      AWS_REGION: ${AWS_REGION}
+      AWS_SHARED_CREDENTIALS_FILE: /usr/share/aws/credentials
+    volumes:
+      - ${HOME}/.aws:/usr/share/aws
     depends_on: [broker]

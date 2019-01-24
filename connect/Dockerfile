@@ -14,4 +14,9 @@ RUN mkdir -p /etc/jmx_exporter /opt/lib \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectStandalone -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-standalone \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectDistributed -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-distributed
 
+# Add kafka-connect-sqs Connector plugin and set permissions on jar file for read by group/others.
+RUN mkdir -p /usr/share/java/kafka-connect-sqs \
+&& curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v1.0.0/kafka-connect-sqs-1.0.0.jar -o /usr/share/java/kafka-connect-sqs/kafka-connect-sqs-1.0.0.jar \
+&& chmod 644 /usr/share/java/kafka-connect-sqs/kafka-connect-sqs-1.0.0.jar
+
 USER connect

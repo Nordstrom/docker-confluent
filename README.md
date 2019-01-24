@@ -11,6 +11,7 @@ The images are based on [confluentinc/cp-docker-images](https://github.com/confl
 - Execute as non-privileged users
 - Include a [Prometheus JMX exporter](https://github.com/prometheus/jmx_exporter)
 - Include a [customized PrincipalBuilder](https://github.com/Nordstrom/kafka-regex-principal-builder)
+- Include the [kafka-connect-sqs Connector](https://github.com/Nordstrom/kafka-connect-sqs)
 - Remove behaviors attached to `KAFKA_ADVERTISED_LISTENERS` env variable
 
 ## example
@@ -28,4 +29,24 @@ curl -s http://localhost:9011/metrics
 
 ```
 curl -s http://localhost:9011/metrics | grep kafka_security_RegexPrincipalBuilder
+```
+
+- list available Kafka Connect connector plugins, including Nordstrom `kafka-connect-sqs`
+
+```
+  curl -s http://localhost:8083/connector-plugins
+```
+
+```
+[
+  {
+    "class": "com.nordstrom.kafka.connect.sqs.SqsSinkConnector",
+    "type": "sink",
+    "version": "1.0.0"
+  },
+  {
+    "class": "com.nordstrom.kafka.connect.sqs.SqsSourceConnector",
+    "type": "source",
+    "version": "1.0.0"
+  },
 ```
