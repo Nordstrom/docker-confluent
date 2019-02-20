@@ -11,7 +11,7 @@ services:
 
   broker:
     build: ./broker/
-    #image: confluentinc/cp-kafka:5.1.0
+    #image: confluentinc/cp-kafka:5.1.1
     ports:
     - 9092:9092
     - 9011:9011
@@ -38,7 +38,7 @@ services:
 
   schema-registry:
     build: ./schema-registry/
-    #image: confluentinc/cp-schema-registry:5.1.0
+    #image: confluentinc/cp-schema-registry:5.1.1
     hostname: schema-registry
     ports:
     - 8080:8080
@@ -55,7 +55,7 @@ services:
 
   connect:
     build: ./connect/
-    #image: confluentinc/cp-kafka-connect:5.1.0
+    #image: confluentinc/cp-kafka-connect:5.1.1
     ports:
     - 8083:8083
     - 9013:9011
