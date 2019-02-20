@@ -14,7 +14,7 @@ The images are based on [confluentinc/cp-docker-images](https://github.com/confl
 - Include the [kafka-connect-sqs Connector](https://github.com/Nordstrom/kafka-connect-sqs)
 - Remove behaviors attached to `KAFKA_ADVERTISED_LISTENERS` env variable
 
-## example
+## examples
 
 Build and run with [Docker Compose](https://docs.docker.com/compose/):
 
@@ -22,31 +22,16 @@ Build and run with [Docker Compose](https://docs.docker.com/compose/):
 docker-compose build
 docker-compose up
 kafkacat -b localhost:9092 -L
-curl -s http://localhost:9011/metrics
 ```
 
-- view RegexPrincipalBuilder metrics (ErrorsPerSec, RequestsPerSec)
+View `RegexPrincipalBuilder` metrics:
 
 ```
 curl -s http://localhost:9011/metrics | grep kafka_security_RegexPrincipalBuilder
 ```
 
-- list available Kafka Connect connector plugins, including Nordstrom `kafka-connect-sqs`
+List the available Kafka Connect connector plugins and their versions:
 
 ```
-  curl -s http://localhost:8083/connector-plugins
-```
-
-```
-[
-  {
-    "class": "com.nordstrom.kafka.connect.sqs.SqsSinkConnector",
-    "type": "sink",
-    "version": "1.0.0"
-  },
-  {
-    "class": "com.nordstrom.kafka.connect.sqs.SqsSourceConnector",
-    "type": "source",
-    "version": "1.0.0"
-  },
+curl -s http://localhost:8083/connector-plugins | jq '.[] | select(.class | contains("nordstrom"))'
 ```
