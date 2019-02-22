@@ -12,7 +12,6 @@ RUN curl -sL https://services.gradle.org/distributions/gradle-5.2.1-bin.zip -o /
  && ln -s /usr/gradle-5.2.1/bin/gradle /usr/bin/gradle
 
 ENV KAFKA_VERSION=2.1.1
-ENV CONFLUENT_VERSION=5.1.1
 
 RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
  && cd /usr/src/kafka \
@@ -20,6 +19,8 @@ RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
  && gradle; ./gradlew installAll
 
 # All the Confluent things
+
+ENV CONFLUENT_VERSION=5.1.1
 
 RUN git clone https://github.com/confluentinc/common /usr/src/confluent-common \
  && cd /usr/src/confluent-common \
@@ -41,8 +42,14 @@ RUN git clone https://github.com/confluentinc/kafka-connect-storage-common /usr/
  && git checkout v${CONFLUENT_VERSION} \
  && mvn install -DskipTests=true
 
+# All the Connectors
+
+ENV S3_CONNECTOR_VERSION=$CONFLUENT_VERSION
+ENV SQS_CONNECTOR_VERSION=1.0.0
+
 # Connector kafka-connect-s3
-# Build the connector but throw out the schema-registry client that
+# Build the connector but throw out the kafka-schema-registry-client that causes
+# this issue: https://github.com/confluentinc/schema-registry/issues/1028
 
 RUN git clone https://github.com/confluentinc/kafka-connect-storage-cloud /usr/src/kafka-connect-storage-cloud \
  && cd /usr/src/kafka-connect-storage-cloud \
@@ -53,8 +60,6 @@ RUN git clone https://github.com/confluentinc/kafka-connect-storage-cloud /usr/s
  && rm /kafka-connect-s3/kafka-schema-registry-client-${CONFLUENT_VERSION}.jar
 
 # Connector kafka-connect-sqs
-ENV SQS_CONNECTOR_VERSION=1.0.0
-
 RUN mkdir -p /kafka-connect-sqs \
  && curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v${SQS_CONNECTOR_VERSION}/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar -o /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar \
  && chmod 644 /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar
