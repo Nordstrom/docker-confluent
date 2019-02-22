@@ -1,4 +1,65 @@
-FROM confluentinc/cp-kafka-connect:5.1.1
+FROM openjdk:8 as builder
+
+RUN apt-get update && apt-get install -y git unzip
+
+RUN curl -sL http://archive.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz \
+  | gunzip \
+  | tar x -C /usr/ \
+ && ln -s /usr/apache-maven-3.6.0/bin/mvn /usr/bin/mvn
+
+RUN curl -sL https://services.gradle.org/distributions/gradle-5.2.1-bin.zip -o /tmp/gradle.zip \
+ && unzip /tmp/gradle.zip -d /usr/ \
+ && ln -s /usr/gradle-5.2.1/bin/gradle /usr/bin/gradle
+
+ENV KAFKA_VERSION=2.1.1
+ENV CONFLUENT_VERSION=5.1.1
+
+RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
+ && cd /usr/src/kafka \
+ && git checkout ${KAFKA_VERSION} \
+ && gradle; ./gradlew installAll
+
+# All the Confluent things
+
+RUN git clone https://github.com/confluentinc/common /usr/src/confluent-common \
+ && cd /usr/src/confluent-common \
+ && git checkout v${CONFLUENT_VERSION} \
+ && mvn install -DskipTests=true
+
+RUN git clone https://github.com/confluentinc/rest-utils /usr/src/rest-utils \
+ && cd /usr/src/rest-utils \
+ && git checkout v${CONFLUENT_VERSION} \
+ && mvn install -DskipTests=true
+
+RUN git clone https://github.com/confluentinc/schema-registry /usr/src/schema-registry \
+ && cd /usr/src/schema-registry \
+ && git checkout v${CONFLUENT_VERSION} \
+ && mvn install -DskipTests=true
+
+RUN git clone https://github.com/confluentinc/kafka-connect-storage-common /usr/src/kafka-connect-storage-common \
+ && cd /usr/src/kafka-connect-storage-common \
+ && git checkout v${CONFLUENT_VERSION} \
+ && mvn install -DskipTests=true
+
+# Connector kafka-connect-s3
+# Build the connector but throw out the schema-registry client that
+
+RUN git clone https://github.com/confluentinc/kafka-connect-storage-cloud /usr/src/kafka-connect-storage-cloud \
+ && cd /usr/src/kafka-connect-storage-cloud \
+ && git checkout v${CONFLUENT_VERSION} \
+ && mvn package -DskipTests=true \
+ && unzip /usr/src/kafka-connect-storage-cloud/kafka-connect-s3/target/components/packages/confluentinc-kafka-connect-s3-${CONFLUENT_VERSION}.zip -d /tmp/ \
+ && mv /tmp/confluentinc-kafka-connect-s3-${CONFLUENT_VERSION}/lib /kafka-connect-s3 \
+ && rm /kafka-connect-s3/kafka-schema-registry-client-${CONFLUENT_VERSION}.jar
+
+# Connector kafka-connect-sqs
+ENV SQS_CONNECTOR_VERSION=1.0.0
+
+RUN mkdir -p /kafka-connect-sqs \
+ && curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v${SQS_CONNECTOR_VERSION}/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar -o /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar \
+ && chmod 644 /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar
+
+FROM confluentinc/cp-kafka-connect-base:5.1.1
 
 RUN groupadd -g 1000 connect \
  && useradd -r -m -u 1000 -g connect connect
@@ -14,9 +75,9 @@ RUN mkdir -p /etc/jmx_exporter /opt/lib \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectStandalone -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-standalone \
  && sed -i "s/^EXTRA_ARGS=.*/EXTRA_ARGS=\${EXTRA_ARGS-'-name connectDistributed -javaagent:\/opt\/lib\/jmx_prometheus_javaagent.jar='\$PROMETHEUS_JMX_EXPORTER_PORT:\$PROMETHEUS_JMX_EXPORTER_CONF}/" /usr/bin/connect-distributed
 
-# Add kafka-connect-sqs Connector plugin and set permissions on jar file for read by group/others.
-RUN mkdir -p /usr/share/java/kafka-connect-sqs \
-&& curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v1.0.0/kafka-connect-sqs-1.0.0.jar -o /usr/share/java/kafka-connect-sqs/kafka-connect-sqs-1.0.0.jar \
-&& chmod 644 /usr/share/java/kafka-connect-sqs/kafka-connect-sqs-1.0.0.jar
+ENV CONNECT_PLUGIN_PATH /opt/connectors
+
+COPY --from=builder /kafka-connect-s3 ${CONNECT_PLUGIN_PATH}/kafka-connect-s3
+COPY --from=builder /kafka-connect-sqs ${CONNECT_PLUGIN_PATH}/kafka-connect-sqs
 
 USER connect
