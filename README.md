@@ -11,6 +11,7 @@ The images are based on [confluentinc/cp-docker-images](https://github.com/confl
 - Execute as non-privileged users
 - Include a [Prometheus JMX exporter](https://github.com/prometheus/jmx_exporter)
 - Include a [customized PrincipalBuilder](https://github.com/Nordstrom/kafka-regex-principal-builder)
+- Include the [kafka-connect-s3 Connector](https://github.com/confluentinc/kafka-connect-storage-cloud)
 - Include the [kafka-connect-sqs Connector](https://github.com/Nordstrom/kafka-connect-sqs)
 - Remove behaviors attached to `KAFKA_ADVERTISED_LISTENERS` env variable
 
