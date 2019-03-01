@@ -28,7 +28,7 @@ services:
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
 
-      # KAFKA_LOG4J_ROOT_LOGLEVEL: DEBUG
+      KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
       KAFKA_PRINCIPAL_BUILDER_CLASS: "com.nordstrom.kafka.security.auth.RegexPrincipalBuilder"
       # Regex to derive principal following 'slash-path' naming convention of <principal>/<uid>
       KAFKA_PRINCIPAL_BUILDER_REGEX: "(.+)/.+"
@@ -73,17 +73,22 @@ services:
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-
+  
       # This will include all connector plugins, including Nordstrom kafka-connect-sqs
       # NB: must include confluent-hub-components, or connect startup will fail :(
       # CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
-      CONNECT_PLUGIN_PATH: /usr/share/java/kafka-connect-sqs
+      CONNECT_PLUGIN_PATH: /opt/connectors
 
       # Uncomment if you want to run locally and have access to AWS resources
       # such as SQS queues.
-      AWS_PROFILE: ${AWS_PROFILE}
+      # AWS_PROFILE: ${AWS_PROFILE}
       AWS_REGION: ${AWS_REGION}
-      AWS_SHARED_CREDENTIALS_FILE: /usr/share/aws/credentials
+      # AWS_SHARED_CREDENTIALS_FILE: /usr/share/aws/credentials
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SECURITY_TOKEN: ${AWS_SECURITY_TOKEN}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      CONNECT_LOG4J_LOGGERS: "io.confluent.connect.s3.logger=DEBUG"
     volumes:
       - ${HOME}/.aws:/usr/share/aws
     depends_on: [broker]

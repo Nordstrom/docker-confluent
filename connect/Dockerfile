@@ -45,11 +45,13 @@ RUN git clone https://github.com/confluentinc/kafka-connect-storage-common /usr/
 # All the Connectors
 
 ENV S3_CONNECTOR_VERSION=$CONFLUENT_VERSION
-ENV SQS_CONNECTOR_VERSION=1.0.0
+ENV SQS_CONNECTOR_VERSION=1.1.0
+ENV CONNECT_ASSUME_ROLE_VERSION=1.0.0
 
 # Connector kafka-connect-s3
 # Build the connector but throw out the kafka-schema-registry-client that causes
 # this issue: https://github.com/confluentinc/schema-registry/issues/1028
+# Add the kafka-connect-assume-role jar
 
 RUN git clone https://github.com/confluentinc/kafka-connect-storage-cloud /usr/src/kafka-connect-storage-cloud \
  && cd /usr/src/kafka-connect-storage-cloud \
@@ -57,7 +59,9 @@ RUN git clone https://github.com/confluentinc/kafka-connect-storage-cloud /usr/s
  && mvn package -DskipTests=true \
  && unzip /usr/src/kafka-connect-storage-cloud/kafka-connect-s3/target/components/packages/confluentinc-kafka-connect-s3-${CONFLUENT_VERSION}.zip -d /tmp/ \
  && mv /tmp/confluentinc-kafka-connect-s3-${CONFLUENT_VERSION}/lib /kafka-connect-s3 \
- && rm /kafka-connect-s3/kafka-schema-registry-client-${CONFLUENT_VERSION}.jar
+ && rm /kafka-connect-s3/kafka-schema-registry-client-${CONFLUENT_VERSION}.jar \
+ && curl -L https://github.com/Nordstrom/kafka-connect-assume-role/releases/download/v${CONNECT_ASSUME_ROLE_VERSION}/kafka-connect-assume-role-${CONNECT_ASSUME_ROLE_VERSION}.jar -o /kafka-connect-s3/kafka-connect-assume-role-${CONNECT_ASSUME_ROLE_VERSION}.jar \
+ && chmod 644 /kafka-connect-s3/kafka-connect-assume-role-${CONNECT_ASSUME_ROLE_VERSION}.jar
 
 # Connector kafka-connect-sqs
 RUN mkdir -p /kafka-connect-sqs \
