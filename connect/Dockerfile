@@ -70,6 +70,9 @@ RUN mkdir -p /kafka-connect-sqs \
 
 FROM confluentinc/cp-kafka-connect-base:5.1.1
 
+RUN sed -i 's/show_env/#show_env/' /etc/confluent/docker/run && \
+    sed -i 's/echo/#echo/' /etc/confluent/docker/run
+
 RUN groupadd -g 1000 connect \
  && useradd -r -m -u 1000 -g connect connect
 
