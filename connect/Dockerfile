@@ -20,7 +20,7 @@ RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
 
 # All the Confluent things
 
-ENV CONFLUENT_VERSION=5.1.1
+ENV CONFLUENT_VERSION=5.1.2
 
 RUN git clone https://github.com/confluentinc/common /usr/src/confluent-common \
  && cd /usr/src/confluent-common \
@@ -68,7 +68,7 @@ RUN mkdir -p /kafka-connect-sqs \
  && curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v${SQS_CONNECTOR_VERSION}/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar -o /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar \
  && chmod 644 /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar
 
-FROM confluentinc/cp-kafka-connect-base:5.1.1
+FROM confluentinc/cp-kafka-connect-base:5.1.2
 
 RUN groupadd -g 1000 connect \
  && useradd -r -m -u 1000 -g connect connect

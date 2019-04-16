@@ -1,4 +1,4 @@
-FROM confluentinc/cp-kafka:5.1.1
+FROM confluentinc/cp-kafka:5.1.2
 
 RUN groupadd -g 1000 broker \
  && useradd -r -m -u 1000 -g broker broker \
