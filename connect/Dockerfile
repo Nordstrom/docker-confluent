@@ -68,6 +68,26 @@ RUN mkdir -p /kafka-connect-sqs \
  && curl -L https://github.com/Nordstrom/kafka-connect-sqs/releases/download/v${SQS_CONNECTOR_VERSION}/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar -o /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar \
  && chmod 644 /kafka-connect-sqs/kafka-connect-sqs-${SQS_CONNECTOR_VERSION}.jar
 
+#
+# Kafka Connect-based mirroring tools
+#
+# Connector MirrorTool
+ENV MIRROR_TOOL_VERSION=3.0.1
+RUN git clone https://github.com/Comcast/MirrorTool-for-Kafka-Connect.git /usr/src/mirror-tool \
+ && cd /usr/src/mirror-tool \
+ && git checkout ${MIRROR_TOOL_VERSION} \
+ && gradle build \
+ && mv build/libs /mirror-tool
+# Connector mirus
+ENV MIRUS_VERSION=0.1.2
+RUN git clone https://github.com/salesforce/mirus.git /usr/src/mirus \
+ && cd /usr/src/mirus \
+ && git checkout v${MIRUS_VERSION} \
+ && mvn -DskipTests package \
+ && mkdir /mirus \
+ && cp -v target/mirus-${MIRUS_VERSION}.jar /mirus/
+
+
 FROM confluentinc/cp-kafka-connect-base:5.1.2
 
 RUN groupadd -g 1000 connect \
@@ -88,5 +108,7 @@ ENV CONNECT_PLUGIN_PATH /opt/connectors
 
 COPY --from=builder /kafka-connect-s3 ${CONNECT_PLUGIN_PATH}/kafka-connect-s3
 COPY --from=builder /kafka-connect-sqs ${CONNECT_PLUGIN_PATH}/kafka-connect-sqs
+COPY --from=builder /mirror-tool ${CONNECT_PLUGIN_PATH}/mirror-tool
+COPY --from=builder /mirus ${CONNECT_PLUGIN_PATH}/mirus
 
 USER connect
