@@ -91,7 +91,8 @@ RUN git clone https://github.com/salesforce/mirus.git /usr/src/mirus \
 FROM confluentinc/cp-kafka-connect-base:5.1.2
 
 RUN groupadd -g 1000 connect \
- && useradd -r -m -u 1000 -g connect connect
+ && useradd -r -m -u 1000 -g connect connect \
+ && sed -i 's/PASSWORD|JAAS_CONFIG/PASSWORD|JAAS_CONFIG|BASIC_AUTH_USER_INFO/' /etc/confluent/docker/bash-config
 
 ENV PROMETHEUS_JMX_EXPORTER_PORT=9011
 ENV PROMETHEUS_JMX_EXPORTER_CONF=/etc/jmx_exporter/kafka_connect.yaml
