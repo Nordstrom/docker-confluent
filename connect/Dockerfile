@@ -11,7 +11,7 @@ RUN curl -sL https://services.gradle.org/distributions/gradle-5.2.1-bin.zip -o /
  && unzip /tmp/gradle.zip -d /usr/ \
  && ln -s /usr/gradle-5.2.1/bin/gradle /usr/bin/gradle
 
-ENV KAFKA_VERSION=2.1.1
+ENV KAFKA_VERSION=2.2.1
 
 RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
  && cd /usr/src/kafka \
@@ -20,7 +20,7 @@ RUN git clone https://github.com/apache/kafka/ /usr/src/kafka \
 
 # All the Confluent things
 
-ENV CONFLUENT_VERSION=5.1.2
+ENV CONFLUENT_VERSION=5.2.2
 
 RUN git clone https://github.com/confluentinc/common /usr/src/confluent-common \
  && cd /usr/src/confluent-common \
@@ -80,7 +80,7 @@ RUN git clone https://github.com/Comcast/MirrorTool-for-Kafka-Connect.git /usr/s
  && mv build/libs /mirror-tool
 
 
-FROM confluentinc/cp-kafka-connect-base:5.1.2
+FROM confluentinc/cp-kafka-connect-base:5.2.2
 
 RUN groupadd -g 1000 connect \
  && useradd -r -m -u 1000 -g connect connect \
